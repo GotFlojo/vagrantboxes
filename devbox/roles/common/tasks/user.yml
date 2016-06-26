@@ -1,0 +1,11 @@
+---
+- name: Delete User from Vagrant box
+  user: name=terry state=absent remove=yes
+
+- name: Setup user
+  user: name=flori comment="Florian Fischer" shell=/bin/zsh uid=1000
+  tags: user
+
+- authorized_key:
+    user: flori
+    key: "{{ lookup('file', 'id_ed25519.pub') }}"

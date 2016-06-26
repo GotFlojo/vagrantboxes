@@ -1,0 +1,33 @@
+---
+# This playbook sets up the dotfiles via github
+
+- name: clone dotfiles repo
+  git: repo=https://github.com/GotFlojo/dotfiles.git
+       dest=/home/flori/.dotfiles
+       force=yes
+
+  tags: dotfiles
+
+- name: Set file permissions
+  file: path=/home/flori/.dotfiles owner=flori group=flori mode=0744 recurse=yes state=directory
+  tags: dotfiles
+
+- name: link dotfiles from repo
+  file:
+      src: /home/flori/.dotfiles/{{item}}
+      dest: /home/flori/{{item}}
+      state: link
+      owner: flori
+      group: flori
+  with_items:
+      - .vimrc
+      - .tmux.conf
+  tags: dotfiles
+
+- name: clone  Vundle repo
+  git: repo=https://github.com/VundleVim/Vundle.vim.git dest=/home/flori/.vim/bundle/Vundle.vim
+  tags: dotfiles
+
+- name: Set file permissions for Vundle
+  file: path=/home/flori/.vim owner=flori group=flori mode=0744 recurse=yes state=directory
+  tags: dotfiles

@@ -1,0 +1,8 @@
+---
+
+- name: install rust and cargo
+  pacman: name={{item}} state=latest update_cache=yes 
+  with_items:
+      - rust
+      - cargo
+  tags: pacman

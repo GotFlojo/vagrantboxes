@@ -1,0 +1,7 @@
+---
+
+- name: install clojure
+  pacman: name={{item}} state=latest update_cache=yes 
+  with_items:
+      - clojure
+  tags: pacman

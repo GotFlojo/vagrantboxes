@@ -1,0 +1,28 @@
+---
+# This playbook contains common plays that will be run on all nodes.
+
+- name: refresh the master package lists
+  pacman: update_cache=yes
+  tags: pacman
+
+- name: install zsh
+  pacman: name=zsh state=latest update_cache=yes
+  tags: pacman
+
+- name: install git
+  pacman: name=git state=latest update_cache=yes
+  tags: pacman
+
+- name: install basic editing tools
+  pacman: name={{item}} state=latest update_cache=yes
+  with_items:
+      - vim
+      - ranger
+      - tmux
+  tags: pacman
+
+- include: user.yml tags=users
+- include: dotfiles.yml
+- include: rust.yml tags=languages
+- include: elixir.yml tags=languages
+- include: clojure.yml tags=languages
