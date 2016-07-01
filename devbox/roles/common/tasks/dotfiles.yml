@@ -2,10 +2,12 @@
 # This playbook sets up the dotfiles via github
 
 - name: clone dotfiles repo
+  become: yes
+  become_user: flori
+ # become_method: su
   git: repo=https://github.com/GotFlojo/dotfiles.git
        dest=/home/flori/.dotfiles
        force=yes
-
   tags: dotfiles
 
 - name: Set file permissions
@@ -25,9 +27,26 @@
   tags: dotfiles
 
 - name: clone  Vundle repo
+  become_user: flori
+  become: yes
   git: repo=https://github.com/VundleVim/Vundle.vim.git dest=/home/flori/.vim/bundle/Vundle.vim
   tags: dotfiles
 
 - name: Set file permissions for Vundle
   file: path=/home/flori/.vim owner=flori group=flori mode=0744 recurse=yes state=directory
+  #notify: update vim plugins
   tags: dotfiles
+
+- name: update vim plugins
+  become_user: flori
+  become: yes
+  #become_method: su
+  shell: vim -i NONE -c VundleUpdate -c quitall 2&> /dev/null
+  #ignore_errors: yes
+
+- name: install oh-my-zsh
+  become_user: flori
+  become: yes
+  shell: sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+- lineinfile: dest=/home/flori/.zshrc state=present regexp='^ZSH_THEME=.+' line='ZSH_THEME="philips"'
+- lineinfile: dest=/home/flori/.zshrc state=present regexp='^# CASE_SENSITIVE=.+' line='CASE_SENSITIVE="true"'

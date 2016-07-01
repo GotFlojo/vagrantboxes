@@ -1,8 +1,13 @@
 ---
 # This playbook contains common plays that will be run on all nodes.
+- name: set timezone
+  command: /usr/bin/timedatectl set-timezone Europe/Berlin
+  command: /usr/bin/timedatectl set-ntp true
+  tags: time
 
-- name: refresh the master package lists
-  pacman: update_cache=yes
+- name : update the system
+  # Run the equivalent of "pacman -Syu" as a separate step
+  pacman: update_cache=yes upgrade=yes
   tags: pacman
 
 - name: install zsh
@@ -11,6 +16,10 @@
 
 - name: install git
   pacman: name=git state=latest update_cache=yes
+  tags: pacman
+
+- name: install cmake
+  pacman: name=cmake state=latest update_cache=yes
   tags: pacman
 
 - name: install basic editing tools
@@ -22,7 +31,12 @@
   tags: pacman
 
 - include: user.yml tags=users
-- include: dotfiles.yml
 - include: rust.yml tags=languages
 - include: elixir.yml tags=languages
 - include: clojure.yml tags=languages
+- include: dotfiles.yml
+
+# When all is set and done
+- name: Force flori to change password
+  shell: chage -d 0 flori
+  when: flori.changed
